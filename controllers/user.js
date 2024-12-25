@@ -2,7 +2,7 @@ import { userModel } from "../models/user.js";
 
 export const getAllUsers = async (req, res) => {
     try {
-        let date = await userModel.find();
+        let data = await userModel.find();
         res.json(data)
     } catch (err) {
         console.log("err");
