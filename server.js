@@ -22,7 +22,7 @@ app.use("/api/borrow", borrowRouter)
 
 
 let port = process.env.PORT;
-app.listen(port, "localhost", () => {
+app.listen(port, () => {
     console.log("app is runnig on port " + port)
 })
 
