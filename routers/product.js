@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { add, deleteById, getAllBooks, getById, updateById } from "../controllers/book.js";
+import { add, deleteById, getAllproducts, getById, updateById } from "../controllers/product.js";
 
 const router = Router();
-router.get("/", getAllBooks)
+router.get("/", getAllproducts)
 router.get("/:id", getById)
 router.delete("/:id", deleteById)
 router.put("/:id", updateById)

@@ -3,10 +3,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 
 import { connectToDB } from "./config/DB.js";
-import bookRouter from "./routers/book.js";
+import productRouter from "./routers/product.js";
 import userRouter from "./routers/user.js";
-import borrowRouter from "./routers/borrow.js";
-import logToFile from "./middlewares/logTOFilrMiddleware.js";
+import orderRouter from "./routers/order.js";
 
 dotenv.config();
 connectToDB();
@@ -14,11 +13,10 @@ const app = express();
 
 app.use(cors())
 app.use(express.json())
-app.use(logToFile)
 
-app.use("/api/books", bookRouter)
+app.use("/api/products",productRouter )
 app.use("/api/user", userRouter)
-app.use("/api/borrow", borrowRouter)
+app.use("/api/orders", orderRouter)
 
 
 let port = process.env.PORT;

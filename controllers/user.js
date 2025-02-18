@@ -1,36 +1,33 @@
 import { userModel } from "../models/user.js";
 
+//----------------------שליפת כל המשתמשים--------------
 export const getAllUsers = async (req, res) => {
     try {
         let data = await userModel.find();
         res.json(data)
     } catch (err) {
         console.log("err");
-        res.status(400).json({ title: "error cannot get all", message: err.message })
+        res.status(400).json({ title: "error cannot get all", message: "wrong something by getting all users"})
     }
 }
-
+//---------------------הוספת משתמש----------------------
 export const addUserSignUp = async (req, res) => {
-    if (!req.body.phone || !req.body.email || !req.body.username || !req.body.password)
-        return res.status(404).json({ title: "missing data", message: "missing data" })
-
-
-
+    if (  !req.body.email || !req.body.username || !req.body.password)
+        return res.status(404).json({ title: "missing data",
+         message: "missing data user name,password or email" })
     try {
-
         let newUser = new userModel(req.body)
         let data = await newUser.save();
-
-
         res.json(data);
     } catch (err) {
         console.log("err");
-        res.status(400).json({ title: "error cannot add ", message: err.message })
+        res.status(400).json({ title: "error cannot add ",
+         message:"something wrong  by add new user" })
     }
 }
-
-export const update = async (req, res) => {
-    let { id } = req.params;
+//----------------עדכון סיסמת משתמש---------------------
+export const updatePassword = async (req, res) => {
+    let { id } = req.body;
 
     if (req.body.password && req.body.password.length < 2)
         return res.status(404).json({ title: "wrong paswword", message: "wrong data" })
@@ -42,10 +39,13 @@ export const update = async (req, res) => {
         res.json(data);
     } catch (err) {
         console.log("err");
-        res.status(400).json({ title: "error cannot update by id", message: err.message })
+        res.status(400).json({ title: "error cannot update by id", 
+        message: "something wrong by update password" }) 
+       
     }
 
 }
+//------------------שליפת משתשמש לפי קוד---------------------------------
 export const getUserById = async (req, res) => {
 
     let { id } = req.params;
@@ -53,14 +53,16 @@ export const getUserById = async (req, res) => {
 
         let data = await userModel.findById(id);
         if (!data)
-            return res.status(404).json({ title: "error cannot get by id", message: "not valid  id parameter found" })
+            return res.status(404).json({ title: "error cannot get by id",
+             message: "not valid  id parameter found" })
         res.json(data);
     } catch (err) {
         console.log("err");
-        res.status(400).json({ title: "error cannot get by id", message: err.message })
+        res.status(400).json({ title: "error cannot get by id", 
+        message: "something wrong by getting user by id" })
     }
 }
-
+//-------------------שליפת משתמש לפי שם משתמש וסיסמא-----------------------
 export const getUserByUserNamePasswordLogin = async (req, res) => {
     try {
         let { username, password } = req.body;
@@ -76,27 +78,21 @@ export const getUserByUserNamePasswordLogin = async (req, res) => {
     }
 }
 
+// -------------------------עדכון פרטי משתמש חוץ מסיסמא-------------------------
+export const update = async (req, res) => {
+    let { id } = req.params;
 
-export const payFine = async (req, res) => {
+    if (req.body.username && req.body.username.length < 2||req.body.email)
+        return res.status(404).json({ title: "missing username or pssword", message: "missing details " })
     try {
-        let {id } = req.params;
-        let { sum } = req.body;
-        if (!sum)
-            return res.status(404).json({ title: "missing payment sum ", message: "missing details" })
-        //   let data = await userModel.findByIdAndUpdate(userid, { $inc: { fine: -sum } }, { new: true });
-        let data = await userModel.findById(id);
 
-
+        let data = await userModel.findByIdAndUpdate(id, req.body, { new: true });
         if (!data)
-            return res.status(404).json({ title: "cannot login", message: "no user with such details" })
-
-        if (sum > data.fine)
-            return res.status(409).json({ title: "wrong payment", message: "too mach money over " + (sum - data.fine) })
-        data.fine -= sum;
-        await data.save();
-        res.json(data)
+            return res.status(404).json({ title: "error cannot update by id", message: "not valid  id parameter found" })
+        res.json(data);
     } catch (err) {
         console.log("err");
-        res.status(400).json({ title: "error cannot pay fine", message: err.message })
+        res.status(400).json({ title: "error cannot update by id", 
+        message: "something wrong by update details" })
     }
 }
