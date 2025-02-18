@@ -34,42 +34,6 @@ export const getOrdersByUserId = async (req, res) => {
 
 }
 
-//--------------------הוספת הזמנה------------------------
-export const addOrder = async (req, res) => {
-    try {
-        let { userId,products  } = req.body;
-        if (!userId || !products || !products.length)
-            return res.status(404).json({ title: "missing required details", message: "userId and products are required" })
-        let user = await userModel.findById(userId);
-        if (!user)
-            return res.status(404).json({ title: "error order by userid", message: "no  user with such id" })
-
-        let borrows = await borrowModel.find({ userId: userId, isBack: false, dateToReturn: { $lt: new Date() } })
-        if (borrows.length > 0) {
-            let numOfBooks = borrows.reduce((prev, item) => { return prev + item.books.length }, 0)
-            user.fine = numOfBooks * 5;
-            await user.save();
-
-        }
-        if (user.fine)
-            return res.status(403).json({ title: "you have to pay fine " + user.fine, message: "no permission ,fisrt pay then borrow anoter book" })
-        let arr = [];
-        books.forEach(async (item) => {
-            let b = await bookModel.findById(item.id);
-            if (!b)
-                return res.status(404).json({ title: "error borrow by userid", message: "wrong book id" })
-            arr.push(b);
-        })
-
-        let order = new orderModel({ userId: userId, books: arr });
-        await borrow.save();
-        return res.json(borrow)
-    }
-    catch (errr) {
-        res.status(400).json({ title: "error cannot add borrow", message: errr.message })
-
-    }
-}
 
 // ------------------------פונקציה להוספת הזמנה----------------------------------
 export const add = async (req, res) => {
@@ -89,7 +53,7 @@ export const add = async (req, res) => {
   };
 
 //----------------מחיקת הזמנה לפי קוד רק אם לא נשלחה---------------------
-export const deleteOrderById = async (req, res) => {
+export const deleteOrder = async (req, res) => {
     try {
       const order = await orderModel.findById(req.params.id);
       if (!order) return res.status(404).json({ title: 'Order not found', message: 'Invalid ID' });
