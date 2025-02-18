@@ -36,7 +36,7 @@ export const getOrdersByUserId = async (req, res) => {
 
 
 // ------------------------פונקציה להוספת הזמנה----------------------------------
-export const add = async (req, res) => {
+export const addOrder = async (req, res) => {
     const { userId, addressSent ,products } = req.body;
   
     if (! userId|| !addressSent ||! products||!products.length>0) {
@@ -68,7 +68,7 @@ export const deleteOrder = async (req, res) => {
   };
 
 //-----------------עדכון הזמנה ושליחתה---------------------
-export const updateOrder = async (req, res) => {
+export const updateOrederSentById = async (req, res) => {
     let { id } = req.params;
     try {
         let data = await orderModel.findOneAndUpdate({ userId: id, isSent: false }, { $set: { isSent: true } }, { new: true })//תעדכן ותחזיר את האוייבקט אחרי העדכון
