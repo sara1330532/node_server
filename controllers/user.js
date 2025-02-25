@@ -3,7 +3,7 @@ import { userModel } from "../models/user.js";
 //----------------------שליפת כל המשתמשים--------------
 export const getAllUsers = async (req, res) => {
     try {
-        let data = await userModel.find();
+        let data = await userModel.find().select('password');
         res.json(data)
     } catch (err) {
         console.log("err");
@@ -51,7 +51,7 @@ export const getUserById = async (req, res) => {
     let { id } = req.params;
     try {
 
-        let data = await userModel.findById(id);
+        let data = await userModel.findById(id).select('password');
         if (!data)
             return res.status(404).json({ title: "error cannot get by id",
              message: "not valid  id parameter found" })
