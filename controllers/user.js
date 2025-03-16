@@ -15,10 +15,17 @@ export const addUserSignUp = async (req, res) => {
     if (  !req.body.email || !req.body.username || !req.body.password)
         return res.status(404).json({ title: "missing data",
          message: "missing data user name,password or email" })
+    if(!(/[a-zA-Z0-9]{5,}/.test(body.password)))  
+        return res.status(404).json("invalid password have to be 5 digit/letters then !/#/*")   
     try {
+        let alreadyUser=await userModel.findOne({username:body.username});
+        if(!alreadyUser)
+            return res.status(409).json({title:"user name aready axist",message:"change user name"});
         let newUser = new userModel(req.body)
+        let token=generateToken(newUser);
         let data = await newUser.save();
-        res.json(data);
+        res.json({...data,token:token});
+
     } catch (err) {
         console.log("err");
         res.status(400).json({ title: "error cannot add ",
@@ -71,6 +78,7 @@ export const getUserByUserNamePasswordLogin = async (req, res) => {
         let data = await userModel.findOne({ username: username, password: password });
         if (!data)
             return res.status(404).json({ title: "cannot login", message: "no user with such details" })
+        data.token=generateToken(data)  ;  
         res.json(data)
     } catch (err) {
         console.log("err");
