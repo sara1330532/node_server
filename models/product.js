@@ -6,9 +6,11 @@ export const productSchema = mongoose.Schema({
     IssueDate: { type: Date, default: new Date() },
     Image: String,
     cost: Number,
-    chairNumber: Number,
     city: String,
     address: String,
+    date:"",
+    dayOnweek:"",
+    hour:"",
     categories: [String],
 
 })
