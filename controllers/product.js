@@ -1,17 +1,20 @@
 import { productModel } from "../models/product.js";
+
+
 //-------------פונקציה לשליפת כל המוצרים---------------
 
 export const getAllproducts = async (req, res) => {
-
-    try {
-
-        let data = await productModel.find();
-        res.json(data);
-    } catch (err) {
-        console.log("err");
-        res.status(400).json({ title: "error cannot get all", message: "somethongs wrong by getting all" })
-    }
-
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 6;
+        try {
+            const products = await productModel
+                .find()
+                .skip((page - 1) * limit)  // דילוג על הכרטיסים הקודמים
+                .limit(limit);  // הגבלת מספר הכרטיסים
+            res.json(products);
+        } catch (err) {
+            res.status(500).json({ message: "שגיאה בשליפת המוצרים" });
+        }
 }
 
 //---------------פונקציה לשליפת מוצר לפי קוד----------------

@@ -1,4 +1,7 @@
-import jwt from jsonwebtoken;
+import jwt from "jsonwebtoken";
+
+//--------פונקציה ליצירת טוקן למשתמש-----
+
 export function generateToken(user) {
     let token = jwt.sign({
         userId: user._id,
@@ -7,7 +10,7 @@ export function generateToken(user) {
     },
         process.env.SECRET_KEY,
         {
-            expiresIn: 60 * 3
+            expiresIn: 60 * 60 * 24
         }
     )
     return token;

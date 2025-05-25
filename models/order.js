@@ -16,8 +16,10 @@ const orderSchema = Schema({
     userId: { type: Types.ObjectId, ref: "user",required:true },
     products:{ type:[{product:productSchema,quantity:Number}],required:true},
     isSent: { type: Boolean, default: false},
-    sentCost:{ type: Number, default: 35 },
     finallCost:Number,
+    pay:{creditCard:String,
+         threeDigit:String,
+        validity:String}
 })
 
 export const orderModel = model("order", orderSchema);

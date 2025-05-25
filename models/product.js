@@ -8,9 +8,9 @@ export const productSchema = mongoose.Schema({
     cost: Number,
     city: String,
     address: String,
-    date:"",
-    dayOnweek:"",
-    hour:"",
+    date:String,
+    dayOnweek:String,
+    hour:String,
     categories: [String],
 
 })

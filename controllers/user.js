@@ -1,9 +1,10 @@
 import { userModel } from "../models/user.js";
+import { generateToken } from "../Utills/jwt.js";
 
 //----------------------שליפת כל המשתמשים--------------
 export const getAllUsers = async (req, res) => {
     try {
-        let data = await userModel.find().select('password');
+        let data = await userModel.find().select('-password');
         res.json(data)
     } catch (err) {
         console.log("err");
@@ -15,23 +16,26 @@ export const addUserSignUp = async (req, res) => {
     if (  !req.body.email || !req.body.username || !req.body.password)
         return res.status(404).json({ title: "missing data",
          message: "missing data user name,password or email" })
-    if(!(/[a-zA-Z0-9]{5,}/.test(body.password)))  
+    if(!(/[a-zA-Z0-9]{5,}/.test(req.body.password)))  
         return res.status(404).json("invalid password have to be 5 digit/letters then !/#/*")   
-    try {
-        let alreadyUser=await userModel.findOne({username:body.username});
-        if(!alreadyUser)
-            return res.status(409).json({title:"user name aready axist",message:"change user name"});
-        let newUser = new userModel(req.body)
-        let token=generateToken(newUser);
-        let data = await newUser.save();
-        res.json({...data,token:token});
+        try {
+            
+            let newUser = new userModel(req.body);
 
-    } catch (err) {
-        console.log("err");
-        res.status(400).json({ title: "error cannot add ",
-         message:"something wrong  by add new user" })
-    }
-}
+            // יצירת טוקן ושמירתו במשתמש
+            let token = generateToken(newUser);
+            console.log(token)
+            newUser.token = token;
+    
+            let data = await newUser.save();
+             data = await userModel.findById(newUser._id).select('-password');
+            res.json({ message: "User created successfully", user: data });
+           
+        } catch (err) {
+            console.log("Error occurred during user creation:", err);
+            res.status(400).json({ title: "error cannot add", message: err.message });
+        }
+    }   
 //----------------עדכון סיסמת משתמש---------------------
 export const updatePassword = async (req, res) => {
     let { id } = req.body;
@@ -58,7 +62,7 @@ export const getUserById = async (req, res) => {
     let { id } = req.params;
     try {
 
-        let data = await userModel.findById(id).select('password');
+        let data = await userModel.findById(id).select('-password');
         if (!data)
             return res.status(404).json({ title: "error cannot get by id",
              message: "not valid  id parameter found" })
@@ -75,10 +79,11 @@ export const getUserByUserNamePasswordLogin = async (req, res) => {
         let { username, password } = req.body;
         if (!username || !password)
             return res.status(404).json({ title: "missing username or pssword", message: "missing details" })
-        let data = await userModel.findOne({ username: username, password: password });
+        let data = await userModel.findOne({ username: username, password: password }).select('-password');
         if (!data)
             return res.status(404).json({ title: "cannot login", message: "no user with such details" })
-        data.token=generateToken(data)  ;  
+         data.token=generateToken(data)  ; 
+         console.log(data.token) 
         res.json(data)
     } catch (err) {
         console.log("err");
@@ -94,7 +99,7 @@ export const update = async (req, res) => {
         return res.status(404).json({ title: "missing username or pssword", message: "missing details " })
     try {
 
-        let data = await userModel.findByIdAndUpdate(id, req.body, { new: true });
+        let data = await userModel.findByIdAndUpdate(id, req.body, { new: true }).select('-password');;
         if (!data)
             return res.status(404).json({ title: "error cannot update by id", message: "not valid  id parameter found" })
         res.json(data);
@@ -104,3 +109,18 @@ export const update = async (req, res) => {
         message: "something wrong by update details" })
     }
 }
+//----------------------מחיקת משתמש לפי ID----------------------
+export const deleteUser = async (req, res) => {
+    let { id } = req.params;
+
+    try {
+        let data = await userModel.findByIdAndDelete(id);
+        if (!data)
+            return res.status(404).json({ title: "error cannot delete", message: "User not found" });
+
+        res.json({ title: "User deleted", message: `User with id ${id} was deleted successfully` });
+    } catch (err) {
+        console.log("Error deleting user:", err);
+        res.status(400).json({ title: "error cannot delete", message: "Something went wrong while deleting the user" });
+    }
+};
